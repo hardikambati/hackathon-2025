@@ -3,10 +3,6 @@
 
 <br>
 
-## Overview
-
-<br>
-
 ## Code setup
 
 1. Creating a `.env` environment file and add the following to it
