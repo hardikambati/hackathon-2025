@@ -4,6 +4,8 @@ def detect_stamp(url: str, model):
     try:
         # add extract image logic
 
+        # TODO save the file locally and pass the local URL path
+
         result = model.predict(url, confidence=40, overlap=30).json()
         predictions = result.get("predictions")
 
