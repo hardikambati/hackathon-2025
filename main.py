@@ -28,7 +28,7 @@ from stamp_module.detect import (
     detect_stamp,
 )
 from awb_module.detect import (
-    detect_awb,
+    PODHelper,
 )
 
 
@@ -139,28 +139,39 @@ def post_signature(image: ImageUploadModel, model = Depends(get_stamp_model)):
     )
 
 
-@app.post("/detect/awb")
-def post_awb(image: ImageUploadAWBModel, model = Depends(get_awb_model)):
+@app.post("/detect/metadata")
+def post_metadata(image: ImageUploadAWBModel, model = Depends(get_awb_model)):
     image_dict = image.model_dump()
     # TODO add url regex handling
     url = image_dict.get("url")
+    name = image_dict.get("name")
+    address = image_dict.get("address")
+    phone = image_dict.get("phone")
     awb_number = image_dict.get("awb_number")
-    if url and awb_number:
-        result, message = detect_awb(
-            url=url,
-            awb_number=awb_number,
-            model=model
+    if (
+        url
+        and name
+        and address
+        and awb_number
+    ):
+        pod_instance = PODHelper(
+            url=url, model=model
         )
+        response = {
+            "is_awb_present": pod_instance.is_awb_present(awb_number),
+            "is_phone_number_present": pod_instance.is_phone_number_present(phone),
+            "is_consignee_name_present": pod_instance.is_consignee_name_present(name),
+            "is_address_present": pod_instance.is_address_present(address)
+        }
         return JSONResponse(
             content={
-                "status": result,
-                "message": message
+                "message": response
             },
             status_code=status.HTTP_200_OK
         )
     return JSONResponse(
         content={
-            "message": "Please pass URL and AWB number."
+            "message": "Bad request"
         },
         status_code=status.HTTP_400_BAD_REQUEST
     )
