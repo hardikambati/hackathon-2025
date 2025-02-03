@@ -24,6 +24,11 @@ from signature_module.detect import (
 from stamp_module.detect import (
     detect_stamp,
 )
+from dotenv import load_dotenv
+
+
+load_dotenv()
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -38,7 +43,7 @@ async def lifespan(app: FastAPI):
 
     # load stamp model
     print("[Stamp] Loading Roboflow model...")
-    rf = Roboflow(api_key=os.getenv("ROBOFLOW_KEY"))
+    rf = Roboflow(api_key=os.environ.get("ROBOFLOW_KEY"))
     project = rf.workspace().project("stamp-detection-okgih")
     stamp_model_path = project.version(1).model
     app.state.stamp_model = stamp_model_path
